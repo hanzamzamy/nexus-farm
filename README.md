@@ -38,3 +38,12 @@ This enables back-end to our application. Authenticate users using many methods,
 
 ### Jetpack Compose
 UI implemented using composable part. It uses Material Theme and works good on Android.
+
+## How Is It Going?
+We need a lot of testing ~~still not properly working yet~~ with AR and can't be combined in one repository (somehow). So, we separate the **experimental** project
+in different repository. Feel free to visit our experimental project. _Yes, we do a lot of crazy stuffs._
+
+https://github.com/hanzamzamy/nexus-farmap
+
+# About Us
+
