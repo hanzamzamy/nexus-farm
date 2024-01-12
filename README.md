@@ -46,4 +46,9 @@ in different repository. Feel free to visit our experimental project. _Yes, we d
 https://github.com/hanzamzamy/nexus-farmap
 
 # About Us
-
+4 Gentlemen en Nexus (4GEN) is a group of students from various universities in Indonesia who tended to become a **Nexus**.
+Nexus is connection, Nexus is relation, Nexus is focal, Nexus is central. In Nexus, we tied, grew, and became better together.
+- **Desman Dwi Saputra** from Universitas Singaperbangsa Karawang as Hacker.
+- **Fikri Mahendra** from President University as Hustler.
+- **Nathanca Arya Vijita** from President University as Hipster.
+- **Rayhan Rizqi Zamzamy** from Institut Teknologi Sepuluh Nopember as Hacker. _<- Beware, non-human being!_
