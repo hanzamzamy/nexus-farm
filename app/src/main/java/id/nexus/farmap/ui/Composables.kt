@@ -3,8 +3,7 @@ package id.nexus.farmap.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ fun FARMapScreen() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    NavHost(navController, startDestination = Navigator.MapLoad.route) {
+    NavHost(navController, startDestination = Navigator.MainMenu.route) {
         composable(Navigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
         composable(Navigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
         composable(Navigator.ARNav.route) { ARNav(scope, navController, snackbarHostState) }
@@ -129,46 +129,67 @@ fun MainMenu(
         var query by remember { mutableStateOf("") }
         var active by remember { mutableStateOf(false) }
 
-        SearchBar(
-            query = query,
-            onQueryChange = { query = it },
-            active = active,
-            onActiveChange = { active = it},
-            placeholder = { Text("Pick Destination") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
-            onSearch = {
-                active = false
-                scope.launch {
-                    snackbarHostState.showSnackbar("Searching $query")
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                var expanded by remember { mutableStateOf(false) }
+                AsyncImage(
+                    model="https://firebasestorage.googleapis.com/v0/b/nexus-farmap.appspot.com/o/logo%2FPU_logo.png?alt=media&token=9bc5eb14-4e76-48a9-a489-974a772b690c",
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text("Welcome to")
+                    Text("${MainUI.map.mapName}", fontSize = 24.sp)
+                    Text(
+                        text = "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Cikarang Utara, Bekasi Regency, West Java 17530",
+                        maxLines = if (expanded) Int.MAX_VALUE else 1
+                    )
                 }
             }
-        ) {
-            repeat(4) { idx ->
-                val resultText = "Suggestion $idx"
-                ListItem(
-                    headlineContent = { Text(resultText) },
-                    supportingContent = { Text("Additional info") },
-                    leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                    modifier = Modifier
-                        .clickable {
-                            query = resultText
-                            active = false
-                        }
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                )
+
+            Divider(modifier = Modifier.fillMaxWidth().width(2.dp))
+
+            SearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                active = active,
+                onActiveChange = { active = it},
+                placeholder = { Text("Pick Destination") },
+                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                onSearch = {
+                    active = false
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Searching $query")
+                    }
+                }
+            ) {
+                repeat(4) { idx ->
+                    val resultText = "Suggestion $idx"
+                    ListItem(
+                        headlineContent = { Text(resultText) },
+                        supportingContent = { Text("Additional info") },
+                        leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
+                        modifier = Modifier
+                            .clickable {
+                                query = resultText
+                                active = false
+                            }
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text("Welcome to")
-            Text("")
-        }
-
 
         SnackbarHost(
             hostState = snackbarHostState,
