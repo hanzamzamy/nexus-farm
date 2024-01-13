@@ -1,10 +1,16 @@
 package id.nexus.farmap.helper.navigation
 
 import id.nexus.farmap.ui.MainUI
+import java.util.Objects
+import kotlin.collections.Map
 
-class Map(name: String) {
+class Map(
+    name: String,
+    val onSuccess: (String) -> Unit = {},
+    val onFail: (String) -> Unit = {}
+) {
     val docRef = MainUI.mapDB.document(name)
-    var mapNodes: MutableMap<String, MutableMap<String, Any>> = mutableMapOf()
+    var mapNodes: MutableMap<String, HashMap<String, Any>> = mutableMapOf()
     var updatedNode: List<String> = mutableListOf()
     var availableId = 1
 
@@ -13,25 +19,23 @@ class Map(name: String) {
     lateinit var iconUrl: String
 
     init {
-        docRef.get()
+        docRef.get(MainUI.sourceDB)
             .addOnSuccessListener { doc ->
                 if (doc.exists()) {
-                    doc.data?.let {
-                        updateMetadata(it)
-                    }
+                    doc.data?.let { updateMetadata(it) }
 
-                    docRef.collection("nodes").get()
+                    docRef.collection("nodes").get(MainUI.sourceDB)
                         .addOnSuccessListener { nodes ->
                             for (node in nodes){
-                                mapNodes += node.id to node.data
+                                mapNodes += node.id to node.data as HashMap<String, Any>
                             }
 
                             updateIdCounter()
 
-                            throw Exception("Map loaded.")
+                            onSuccess("Map loaded.")
                         }
                         .addOnFailureListener { e ->
-                            throw Error("Couldn't load nodes: $e.")
+                            onFail("Couldn't load nodes: $e.")
                         }
                 }else if(MainUI.adminMode){
                     val data = hashMapOf<String, Any>(
@@ -60,21 +64,21 @@ class Map(name: String) {
                                .addOnSuccessListener {
                                    mapNodes += "0" to dataNode
                                    updateIdCounter()
-                                   throw Exception("Map created.")
+                                   onSuccess("Map created.")
                                }
                                .addOnFailureListener { e ->
-                                   throw Error("Couldn't create node: $e.")
+                                   onFail("Couldn't create node: $e.")
                                }
                         }
                         .addOnFailureListener { e ->
-                            throw Error("Couldn't create map: $e.")
+                            onFail("Couldn't create map: $e.")
                         }
                 }else {
-                    throw Exception("Map didn't exist.")
+                    onFail("Map didn't exist.")
                 }
             }
             .addOnFailureListener { e ->
-                throw Error("Couldn't load map: $e.")
+                onFail("Couldn't load map: $e.")
             }
     }
 

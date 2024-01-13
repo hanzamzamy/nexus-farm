@@ -2,9 +2,11 @@ package id.nexus.farmap.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +22,7 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import id.nexus.farmap.helper.navigation.Map
+import kotlinx.coroutines.delay
 
 @Composable
 fun FARMapScreen() {
@@ -27,7 +30,7 @@ fun FARMapScreen() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    NavHost(navController, startDestination = Navigator.MainMenu.route) {
+    NavHost(navController, startDestination = Navigator.MapLoad.route) {
         composable(Navigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
         composable(Navigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
         composable(Navigator.ARNav.route) { ARNav(scope, navController, snackbarHostState) }
@@ -89,18 +92,19 @@ fun MapLoad(
                     if (mapName.isNotEmpty()) {
                         MainUI.adminMode = adminMode
                         MainUI.sourceDB = if (forceCache) Source.CACHE else Source.DEFAULT
-                        try {
-                            MainUI.map = Map(mapName)
-                            navController.navigate(Navigator.MainMenu.route)
-                        }catch (e: Error){
-                            scope.launch {
-                                snackbarHostState.showSnackbar("[ERROR] $e")
-                            }
-                        }catch (e: Exception){
-                            scope.launch {
-                                snackbarHostState.showSnackbar("[INFO] $e")
-                            }
-                        }
+                        MainUI.map = Map(
+                            mapName,
+                            onSuccess = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[INFO] $msg")
+                                }
+                                navController.navigate(Navigator.MainMenu.route)
+                            },
+                            onFail = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[ERROR] $msg")
+                                }
+                            })
                     }
                 }) {
                     Text("Load")
@@ -141,7 +145,7 @@ fun MainMenu(
             ){
                 var expanded by remember { mutableStateOf(false) }
                 AsyncImage(
-                    model="https://firebasestorage.googleapis.com/v0/b/nexus-farmap.appspot.com/o/logo%2FPU_logo.png?alt=media&token=9bc5eb14-4e76-48a9-a489-974a772b690c",
+                    model=MainUI.map.iconUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
                 )
@@ -149,9 +153,9 @@ fun MainMenu(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text("Welcome to")
-                    Text("${MainUI.map.mapName}", fontSize = 24.sp)
+                    Text(MainUI.map.mapName, fontSize = 24.sp)
                     Text(
-                        text = "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Cikarang Utara, Bekasi Regency, West Java 17530",
+                        text = MainUI.map.mapAddress,
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                     )
                 }
@@ -173,20 +177,26 @@ fun MainMenu(
                     }
                 }
             ) {
-                repeat(4) { idx ->
-                    val resultText = "Suggestion $idx"
-                    ListItem(
-                        headlineContent = { Text(resultText) },
-                        supportingContent = { Text("Additional info") },
-                        leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                        modifier = Modifier
-                            .clickable {
-                                query = resultText
-                                active = false
-                            }
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+                LazyColumn {
+                    items(MainUI.map.mapNodes.keys.filter {
+                        val type = (MainUI.map.mapNodes[it]?.get("type") as Long).toInt()
+                        if (query.isNotEmpty())
+
+                            it.lowercase().contains(query.lowercase()) && (type == 1 || type == 2)
+                        else false
+                    } as List<String>){ idx ->
+                            ListItem(
+                                headlineContent = { Text(idx) },
+                                supportingContent = { (MainUI.map.mapNodes[idx]?.get("shortDesc") as? String)?.let { Text(it) } },
+                                leadingContent = { Icon(Icons.Filled.Place, contentDescription = null) },
+                                modifier = Modifier
+                                    .clickable {
+                                        query = idx
+                                    }
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                            )
+                    }
                 }
             }
         }
