@@ -1,8 +1,6 @@
 package id.nexus.farmap.helper.navigation
 
 import id.nexus.farmap.ui.MainUI
-import java.util.Objects
-import kotlin.collections.Map
 
 class Map(
     name: String,

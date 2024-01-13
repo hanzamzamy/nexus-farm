@@ -22,7 +22,6 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import id.nexus.farmap.helper.navigation.Map
-import kotlinx.coroutines.delay
 
 @Composable
 fun FARMapScreen() {
@@ -184,7 +183,7 @@ fun MainMenu(
 
                             it.lowercase().contains(query.lowercase()) && (type == 1 || type == 2)
                         else false
-                    } as List<String>){ idx ->
+                    }){ idx ->
                             ListItem(
                                 headlineContent = { Text(idx) },
                                 supportingContent = { (MainUI.map.mapNodes[idx]?.get("shortDesc") as? String)?.let { Text(it) } },
