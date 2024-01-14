@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +34,12 @@ fun FARMapScreen() {
     NavHost(navController, startDestination = Navigator.MapLoad.route) {
         composable(Navigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
         composable(Navigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
+        composable(
+            route ="${Navigator.EntryPage.route}/{label}",
+            arguments = listOf(navArgument("label"){
+                type = NavType.StringType
+            })
+        ) { EntryPage(scope, navController, snackbarHostState, it.arguments?.getString("label") ?: "") }
         composable(Navigator.ARNav.route) { ARNav(scope, navController, snackbarHostState) }
     }
 }
@@ -129,8 +137,6 @@ fun MainMenu(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
-        var query by remember { mutableStateOf("") }
-        var active by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier.padding(vertical = 16.dp),
@@ -143,24 +149,121 @@ fun MainMenu(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 var expanded by remember { mutableStateOf(false) }
-                AsyncImage(
-                    model=MainUI.map.iconUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text("Welcome to")
-                    Text(MainUI.map.mapName, fontSize = 24.sp)
-                    Text(
-                        text = MainUI.map.mapAddress,
-                        maxLines = if (expanded) Int.MAX_VALUE else 1
-                    )
+                if (MainUI.adminMode){
+                    var editor by remember { mutableStateOf(false) }
+                    var editName by remember { mutableStateOf(MainUI.map.mapName) }
+                    var editAddress by remember { mutableStateOf(MainUI.map.mapAddress) }
+                    var editUrl by remember { mutableStateOf(MainUI.map.iconUrl) }
+                    var nameError by remember { mutableStateOf(false) }
+                    var addressError by remember { mutableStateOf(false) }
+                    var urlError by remember { mutableStateOf(false) }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AsyncImage(
+                            model=MainUI.map.iconUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
+                        )
+
+                        Button(onClick = {
+                            if (editor) {
+                                if (!nameError && !addressError && !urlError) {
+                                    MainUI.map.changeMetadata(editName, editAddress, editUrl)
+                                    editor = false
+                                }
+                            } else{
+                                editor = true
+                            }
+                        }) {
+                            Text(if (editor) "Save" else "Edit")
+                        }
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Welcome to")
+                        Text(MainUI.map.mapName, fontSize = 24.sp)
+
+                        Text(
+                            text = MainUI.map.mapAddress,
+                            maxLines = if (expanded) Int.MAX_VALUE else 1
+                        )
+
+                        if (editor) {
+                            TextField(
+                                value = editName,
+                                onValueChange = {
+                                    if (it.isEmpty()) nameError = true
+                                    else nameError = false
+                                    editName = it
+                                },
+                                label = { Text("Location Name") },
+                                singleLine = false,
+                                isError = nameError,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            TextField(
+                                value = editAddress,
+                                onValueChange = {
+                                    if (it.isEmpty()) addressError = true
+                                    else addressError = false
+                                    editAddress = it
+                                },
+                                label = { Text("Location Address") },
+                                singleLine = false,
+                                isError = addressError,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            TextField(
+                                value = editUrl,
+                                onValueChange = {
+                                    if (it.isEmpty()) urlError = true
+                                    else urlError = false
+                                    editUrl = it
+                                },
+                                label = { Text("Icon URL") },
+                                singleLine = false,
+                                isError = urlError,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AsyncImage(
+                            model = MainUI.map.iconUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
+                        )
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Welcome to")
+                        Text(MainUI.map.mapName, fontSize = 24.sp)
+                        Text(
+                            text = MainUI.map.mapAddress,
+                            maxLines = if (expanded) Int.MAX_VALUE else 1
+                        )
+                    }
                 }
+
             }
 
             Divider(modifier = Modifier.fillMaxWidth().width(2.dp))
+
+            var query by remember { mutableStateOf("") }
+            var active by remember { mutableStateOf(false) }
 
             SearchBar(
                 query = query,
@@ -171,8 +274,15 @@ fun MainMenu(
                 leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                 onSearch = {
                     active = false
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Searching $query")
+                    if (MainUI.map.mapNodes.containsKey(query)){
+                        navController.navigate("${Navigator.EntryPage.route}/${query}")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("[INFO] Searching $query.")
+                        }
+                    }else{
+                        scope.launch {
+                            snackbarHostState.showSnackbar("[ERROR] Invalid Destination.")
+                        }
                     }
                 }
             ) {
@@ -205,6 +315,16 @@ fun MainMenu(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
+}
+
+@Composable
+fun EntryPage(
+    scope: CoroutineScope,
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    label: String
+){
+
 }
 
 @Composable
