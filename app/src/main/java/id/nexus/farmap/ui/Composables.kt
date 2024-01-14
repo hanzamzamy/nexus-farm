@@ -31,7 +31,7 @@ fun FARMapScreen() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    NavHost(navController, startDestination = Navigator.MapLoad.route) {
+    NavHost(navController, startDestination = Navigator.EntryPage.route) {
         composable(Navigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
         composable(Navigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
         composable(
@@ -171,7 +171,7 @@ fun MainMenu(
                         Button(onClick = {
                             if (editor) {
                                 if (!nameError && !addressError && !urlError) {
-                                    MainUI.map.changeMetadata(editName, editAddress, editUrl)
+                                    MainUI.map.uploadMetadata(editName, editAddress, editUrl)
                                     editor = false
                                 }
                             } else{

@@ -92,7 +92,7 @@ class Map(
         }
     }
 
-    fun changeMetadata(name: String, address: String, iconUrl: String){
+    fun uploadMetadata(name: String, address: String, iconUrl: String){
         val data = hashMapOf<String, Any>(
             "name" to name,
             "address" to address,
@@ -106,5 +106,13 @@ class Map(
             .addOnFailureListener { e ->
                 onFail("Couldn't change metadata: $e.")
             }
+    }
+
+    fun updateNode(){
+
+    }
+
+    fun uploadNodes(){
+
     }
 }
