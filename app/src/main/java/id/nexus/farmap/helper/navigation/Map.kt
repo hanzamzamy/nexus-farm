@@ -101,10 +101,10 @@ class Map(
         docRef.set(data)
             .addOnSuccessListener {
                 updateMetadata(data)
-                throw Exception("Metadata changed.")
+                onSuccess("Metadata changed.")
             }
             .addOnFailureListener { e ->
-                throw Error("Couldn't change metadata: $e.")
+                onFail("Couldn't change metadata: $e.")
             }
     }
 }
