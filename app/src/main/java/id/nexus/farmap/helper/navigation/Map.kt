@@ -108,11 +108,11 @@ class Map(
             }
     }
 
-    fun updateNode(){
+    fun updateNode(id: String, payload: HashMap<String, Any>){
 
     }
 
-    fun uploadNodes(){
+    fun uploadNodes(nodes: List<String>){
 
     }
 }
