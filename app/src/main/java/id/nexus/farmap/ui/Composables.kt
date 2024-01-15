@@ -3,14 +3,17 @@ package id.nexus.farmap.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,7 +34,7 @@ fun FARMapScreen() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    NavHost(navController, startDestination = Navigator.EntryPage.route) {
+    NavHost(navController, startDestination = Navigator.MapLoad.route) {
         composable(Navigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
         composable(Navigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
         composable(
@@ -168,7 +171,8 @@ fun MainMenu(
                             modifier = Modifier.fillMaxWidth(0.2f).clickable { expanded = !expanded }
                         )
 
-                        Button(onClick = {
+                        Button(
+                            onClick = {
                             if (editor) {
                                 if (!nameError && !addressError && !urlError) {
                                     MainUI.map.uploadMetadata(editName, editAddress, editUrl)
@@ -197,8 +201,7 @@ fun MainMenu(
                             TextField(
                                 value = editName,
                                 onValueChange = {
-                                    if (it.isEmpty()) nameError = true
-                                    else nameError = false
+                                    nameError = it.isEmpty()
                                     editName = it
                                 },
                                 label = { Text("Location Name") },
@@ -210,8 +213,7 @@ fun MainMenu(
                             TextField(
                                 value = editAddress,
                                 onValueChange = {
-                                    if (it.isEmpty()) addressError = true
-                                    else addressError = false
+                                    addressError = it.isEmpty()
                                     editAddress = it
                                 },
                                 label = { Text("Location Address") },
@@ -223,8 +225,7 @@ fun MainMenu(
                             TextField(
                                 value = editUrl,
                                 onValueChange = {
-                                    if (it.isEmpty()) urlError = true
-                                    else urlError = false
+                                    urlError = it.isEmpty()
                                     editUrl = it
                                 },
                                 label = { Text("Icon URL") },
@@ -324,7 +325,130 @@ fun EntryPage(
     snackbarHostState: SnackbarHostState,
     label: String
 ){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Column{
+//            if(MainUI.adminMode) {
+//                var editor by remember { mutableStateOf(false) }
+//                var editDesc by remember { mutableStateOf(MainUI.map.mapNodes[label]?.get("longDesc") as String) }
+//                var descError by remember { mutableStateOf(false) }
+//
+//                Box(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    contentAlignment = Alignment.BottomEnd
+//                ){
+//                    LazyRow {
+//                        items(5/*MainUI.map.mapNodes[label]?.get("imagesUrl") as List<String>*/){url->
+//                            AsyncImage(
+//                                model = "https://ipsf.net/wp-content/uploads/2021/12/dummy-image-square.webp",//url,
+//                                contentDescription = null,
+//                                contentScale = ContentScale.FillHeight,
+//                                modifier = Modifier.fillMaxHeight(0.5f)
+//                            )
+//                        }
+//                    }
+//
+//                    FloatingActionButton(
+//                        modifier = Modifier.padding(24.dp),
+//                        onClick = {
+//                            navController.navigate(Navigator.ARNav.route)
+//                            scope.launch {
+//                                snackbarHostState.showSnackbar("[INFO] Routing to $label")
+//                            }
+//                        }
+//                    ){
+//                        Icon(Icons.Filled.Send, null)
+//                    }
+//                }
+//
+//                Column(
+//                    horizontalAlignment = Alignment.Start,
+//                    verticalArrangement = Arrangement.spacedBy(16.dp),
+//                    modifier = Modifier.padding(16.dp)
+//                ){
+//                    Text("A123" /*label*/, fontSize = 24.sp)
+//                    (MainUI.map.mapNodes[label]?.get("longDesc") as? String)?.let { Text(it) }
+//
+//                    TextField(
+//                        value = editDesc,
+//                        onValueChange = {
+//                            descError = it.isEmpty()
+//                            editDesc = it
+//                        },
+//                        label = { Text("Description") },
+//                        singleLine = false,
+//                        isError = descError,
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                }
+//
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.Bottom
+//                ){
+//                    Button(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = {
+//                            if (editor) {
+//                                if (!descError) {
+//                                    //TODO
+//                                    editor = false
+//                                }
+//                            } else{
+//                                editor = true
+//                            }
+//                        }) {
+//                        Text(if (editor) "Save" else "Edit")
+//                    }
+//                }
+//            }else{
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.BottomEnd
+                ){
+                    LazyRow {
+                        items(5/*MainUI.map.mapNodes[label]?.get("imagesUrl") as List<String>*/){url->
+                            AsyncImage(
+                                model = "https://ipsf.net/wp-content/uploads/2021/12/dummy-image-square.webp",//url,
+                                contentDescription = null,
+                                contentScale = ContentScale.FillHeight,
+                                modifier = Modifier.fillMaxHeight(0.5f)
+                            )
+                        }
+                    }
 
+                    FloatingActionButton(
+                        modifier = Modifier.padding(24.dp),
+                        onClick = {
+                            navController.navigate(Navigator.ARNav.route)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("[INFO] Routing to $label")
+                            }
+                        }
+                    ){
+                        Icon(Icons.Filled.Send, null)
+                    }
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                ){
+                    Text("A123" /*label*/, fontSize = 24.sp)
+                    (MainUI.map.mapNodes[label]?.get("longDesc") as? String)?.let { Text(it) }
+                    }
+            }
+
+//        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
 
 @Composable
