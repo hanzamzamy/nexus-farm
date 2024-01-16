@@ -58,9 +58,9 @@ class Map(
                                     "z" to 0
                                 )
                             )
-                           docRef.collection("nodes").document("0").set(dataNode)
+                           docRef.collection("nodes").document("path0").set(dataNode)
                                .addOnSuccessListener {
-                                   mapNodes += "0" to dataNode
+                                   mapNodes += "path0" to dataNode
                                    updateIdCounter()
                                    onSuccess("Map created.")
                                }
@@ -80,16 +80,16 @@ class Map(
             }
     }
 
+    fun updateIdCounter(){
+        while (mapNodes.containsKey("path$availableId")){
+            availableId++
+        }
+    }
+
     fun updateMetadata(src: MutableMap<String, Any>){
         mapName = src["name"] as String
         mapAddress = src["address"] as String
         iconUrl = src["iconUrl"] as String
-    }
-
-    fun updateIdCounter(){
-        while (mapNodes.containsKey("$availableId")){
-            availableId++
-        }
     }
 
     fun uploadMetadata(name: String, address: String, iconUrl: String){
@@ -98,21 +98,37 @@ class Map(
             "address" to address,
             "iconUrl" to iconUrl
         )
-        docRef.set(data)
+        docRef.update(data)
             .addOnSuccessListener {
                 updateMetadata(data)
-                onSuccess("Metadata changed.")
+                onSuccess("Metadata ${docRef.id} updated.")
             }
             .addOnFailureListener { e ->
-                onFail("Couldn't change metadata: $e.")
+                onFail("Couldn't update metadata: $e.")
             }
     }
 
-    fun updateNode(id: String, payload: HashMap<String, Any>){
+    fun updateEntry(id: String, desc: String, url: List<String>){
+        val data = hashMapOf<String, Any>(
+            "longDesc" to desc,
+            "imagesUrl" to url,
+        )
+
+        docRef.collection("nodes").document(id).update(data)
+            .addOnSuccessListener {
+                mapNodes[id]?.putAll(data)
+                onSuccess("Entry $id updated.")
+            }
+            .addOnFailureListener { e ->
+                onFail("Couldn't update entry: $e.")
+            }
+    }
+
+    fun updateARNode(id: String, payload: HashMap<String, Any>){
 
     }
 
-    fun uploadNodes(nodes: List<String>){
+    fun uploadARNodes(nodes: List<String>){
 
     }
 }
