@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -85,7 +86,8 @@ fun MainMenu(
 
                         Text(
                             text = MainUI.map.mapAddress,
-                            maxLines = if (expanded) Int.MAX_VALUE else 1
+                            maxLines = if (expanded) Int.MAX_VALUE else 1,
+                            textAlign = TextAlign.Justify
                         )
 
                         if (editor) {
@@ -145,7 +147,8 @@ fun MainMenu(
                         Text(MainUI.map.mapName, fontSize = 24.sp)
                         Text(
                             text = MainUI.map.mapAddress,
-                            maxLines = if (expanded) Int.MAX_VALUE else 1
+                            maxLines = if (expanded) Int.MAX_VALUE else 1,
+                            textAlign = TextAlign.Justify
                         )
                     }
                 }

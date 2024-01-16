@@ -26,7 +26,7 @@ fun FARMapScreen() {
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
 
-        NavHost(navController, startDestination = ScreenNavigator.MapLoad.route) {
+        NavHost(navController, startDestination = ScreenNavigator.ARNav.route) {
             composable(ScreenNavigator.MapLoad.route) { MapLoad(scope, navController, snackbarHostState) }
             composable(ScreenNavigator.MainMenu.route) { MainMenu(scope, navController, snackbarHostState) }
             composable(
