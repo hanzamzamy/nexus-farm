@@ -11,7 +11,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+
 import id.nexus.farmap.helper.navigation.Map
+import id.nexus.farmap.ui.composable.FARMapScreen
 import id.nexus.farmap.ui.theme.FARMapTheme
 
 class MainUI : ComponentActivity() {
