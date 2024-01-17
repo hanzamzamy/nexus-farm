@@ -9,7 +9,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.Source
+import id.nexus.farmap.helper.ar.ARContent
 import id.nexus.farmap.helper.navigation.Map
+import id.nexus.farmap.helper.ocr.Analyzer
 import id.nexus.farmap.ui.MainUI
 import id.nexus.farmap.helper.ui.ScreenNavigator
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +72,30 @@ fun MapLoad(
                     if (mapName.isNotEmpty()) {
                         MainUI.adminMode = adminMode
                         MainUI.sourceDB = if (forceCache) Source.CACHE else Source.DEFAULT
+                        MainUI.ocr = Analyzer(
+                            onSuccess = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[INFO] $msg")
+                                }
+                                navController.navigate(ScreenNavigator.MainMenu.route)
+                            },
+                            onFail = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[ERROR] $msg")
+                                }
+                            })
+                        MainUI.ar = ARContent(
+                            onSuccess = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[INFO] $msg")
+                                }
+                                navController.navigate(ScreenNavigator.MainMenu.route)
+                            },
+                            onFail = { msg ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("[ERROR] $msg")
+                                }
+                            })
                         MainUI.map = Map(
                             mapName,
                             onSuccess = { msg ->
