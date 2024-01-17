@@ -98,13 +98,13 @@ fun ARNav(
 //            onSessionUpdated = { session, updatedFrame ->
 //                frame = updatedFrame
 //
+//                MainUI.ocr.analyze(updatedFrame, session)
+//
 //                updatedFrame.getUpdatedPlanes()
 //                    .firstOrNull { it.type == Plane.Type.VERTICAL }
 //                    ?.let { it.createAnchorOrNull(it.centerPose) }?.let { anchor ->
 //
 //                    }
-//
-//                //frame!!.acquireCameraImage()
 //            },
 //            onGestureListener = rememberOnGestureListener(
 //                onSingleTapConfirmed = { motionEvent, node ->
@@ -115,7 +115,7 @@ fun ARNav(
 //
 //                            }
 //                    }
-//                })
+//                }),
 //        )
         Text(
             modifier = Modifier
