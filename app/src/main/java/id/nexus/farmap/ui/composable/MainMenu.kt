@@ -203,6 +203,16 @@ fun MainMenu(
                     }
                 }
             }
+
+            if(MainUI.adminMode){
+                Button(
+                    onClick = {
+                        navController.navigate(ScreenNavigator.ARNav.route)
+                    }
+                ){
+                    Text("Admin Map Panel")
+                }
+            }
         }
     }
 }
