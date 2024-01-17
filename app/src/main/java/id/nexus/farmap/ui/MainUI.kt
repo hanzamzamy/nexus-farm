@@ -11,14 +11,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import id.nexus.farmap.helper.ar.ARContent
 
 import id.nexus.farmap.helper.navigation.Map
+import id.nexus.farmap.helper.ocr.Analyzer
 import id.nexus.farmap.ui.composable.FARMapScreen
 import id.nexus.farmap.ui.theme.FARMapTheme
 
 class MainUI : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = this
 
         setContent {
             FARMapTheme {
@@ -30,7 +33,10 @@ class MainUI : ComponentActivity() {
     }
 
     companion object {
+        lateinit var instance: ComponentActivity
         val mapDB = Firebase.firestore.collection("maps")
+        lateinit var ocr: Analyzer
+        lateinit var ar: ARContent
         lateinit var map: Map
         var adminMode: Boolean = false
         var sourceDB = Source.DEFAULT
