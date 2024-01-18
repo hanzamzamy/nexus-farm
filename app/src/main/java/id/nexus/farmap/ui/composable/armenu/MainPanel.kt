@@ -5,30 +5,30 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import id.nexus.farmap.helper.ui.ARMenuNavigator
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun MainPanel(){
+fun MainPanel(
+    menuNavController: NavController
+){
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(24.dp)
         ) {
             Button(
                 onClick = {
-
-                },
-                modifier = Modifier.padding(8.dp)
+                    menuNavController.navigate(ARMenuNavigator.AddNode.route)
+                }
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Filled.Add, null)
@@ -38,21 +38,8 @@ fun MainPanel(){
 
             Button(
                 onClick = {
-
-                },
-                modifier = Modifier.padding(8.dp)
-            ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.List, null)
-                    Text("List", fontSize = 12.sp)
+                    menuNavController.navigate(ARMenuNavigator.ARRoute.route)
                 }
-            }
-
-            Button(
-                onClick = {
-
-                },
-                modifier = Modifier.padding(8.dp)
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Filled.Search, null)
@@ -62,32 +49,23 @@ fun MainPanel(){
 
             Button(
                 onClick = {
-
-                },
-                modifier = Modifier.padding(8.dp)
-            ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.KeyboardArrowUp, null)
-                    Text("Upload", fontSize = 12.sp)
+                    menuNavController.navigate(ARMenuNavigator.MapInit.route)
                 }
-            }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp).fillMaxWidth()
-        ) {
-            Button(
-                onClick = {
-
-                },
-                modifier = Modifier.padding(8.dp),
-                enabled = false
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Filled.Refresh, null)
                     Text("Init", fontSize = 12.sp)
+                }
+            }
+
+            Button(
+                onClick = {
+                    //menuNavController.navigate(ARMenuNavigator.MapUpload.route)
+                }
+            ){
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.KeyboardArrowUp, null)
+                    Text("Upload", fontSize = 12.sp)
                 }
             }
         }

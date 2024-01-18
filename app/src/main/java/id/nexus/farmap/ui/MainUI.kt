@@ -36,7 +36,7 @@ class MainUI : ComponentActivity() {
         lateinit var instance: ComponentActivity
         val mapDB = Firebase.firestore.collection("maps")
         lateinit var ocr: Analyzer
-        lateinit var ar: ARContent
+        lateinit var arContent: ARContent
         lateinit var map: Map
         var adminMode: Boolean = false
         var sourceDB = Source.DEFAULT

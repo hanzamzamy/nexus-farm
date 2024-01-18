@@ -72,6 +72,7 @@ fun MapLoad(
                     if (mapName.isNotEmpty()) {
                         MainUI.adminMode = adminMode
                         MainUI.sourceDB = if (forceCache) Source.CACHE else Source.DEFAULT
+
                         MainUI.ocr = Analyzer(
                             onSuccess = { msg ->
                                 scope.launch {
@@ -84,7 +85,8 @@ fun MapLoad(
                                     snackbarHostState.showSnackbar("[ERROR] $msg")
                                 }
                             })
-                        MainUI.ar = ARContent(
+
+                        MainUI.arContent = ARContent(
                             onSuccess = { msg ->
                                 scope.launch {
                                     snackbarHostState.showSnackbar("[INFO] $msg")
@@ -96,6 +98,7 @@ fun MapLoad(
                                     snackbarHostState.showSnackbar("[ERROR] $msg")
                                 }
                             })
+
                         MainUI.map = Map(
                             mapName,
                             onSuccess = { msg ->
