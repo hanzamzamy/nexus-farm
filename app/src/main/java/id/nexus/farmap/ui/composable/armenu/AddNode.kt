@@ -244,7 +244,7 @@ fun AddNode(
 
             Button(
                 onClick = {
-                    data.showBottomSheet = false
+                    //data.showBottomSheet = false
                     data.mode = Mode.ADD
                 }
             ){

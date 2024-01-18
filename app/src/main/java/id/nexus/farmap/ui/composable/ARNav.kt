@@ -18,13 +18,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.ar.core.Config
-import com.google.ar.core.Frame
-import com.google.ar.core.Plane
-import com.google.ar.core.TrackingFailureReason
+import com.google.ar.core.*
+import dev.romainguy.kotlin.math.Quaternion
 import id.nexus.farmap.R
+import id.nexus.farmap.helper.ar.ARContent
+import id.nexus.farmap.helper.ar.Mode
 import id.nexus.farmap.helper.ar.ViewerData
 import id.nexus.farmap.helper.ui.ARMenuNavigator
+import id.nexus.farmap.helper.ui.ScreenNavigator
 import id.nexus.farmap.ui.MainUI
 import id.nexus.farmap.ui.composable.armenu.*
 import id.nexus.farmap.ui.theme.FARMapTheme
@@ -34,8 +35,13 @@ import io.github.sceneview.ar.arcore.createAnchorOrNull
 import io.github.sceneview.ar.arcore.firstByTypeOrNull
 import io.github.sceneview.ar.arcore.getUpdatedPlanes
 import io.github.sceneview.ar.getDescription
+import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraNode
+import io.github.sceneview.math.Position
+import io.github.sceneview.math.Rotation
+import io.github.sceneview.math.toQuaternion
 import io.github.sceneview.model.ModelInstance
+import io.github.sceneview.node.ModelNode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -68,6 +74,7 @@ fun ARNav(
             mutableStateOf<TrackingFailureReason?>(null)
         }
         var frame by remember { mutableStateOf<Frame?>(null) }
+
         ARScene(
             modifier = Modifier.fillMaxSize(),
             childNodes = childNodes,
@@ -98,7 +105,11 @@ fun ARNav(
             onSessionUpdated = { session, updatedFrame ->
                 frame = updatedFrame
 
-                MainUI.ocr.analyze(updatedFrame, session)
+                if(arViewer.mode == Mode.SCAN){
+                    frame?.let {
+                        MainUI.ocr.analyze(it, session)
+                    }
+                }
 
                 updatedFrame.getUpdatedPlanes()
                     .firstOrNull { it.type == Plane.Type.VERTICAL }
@@ -109,11 +120,23 @@ fun ARNav(
             onGestureListener = rememberOnGestureListener(
                 onSingleTapConfirmed = { motionEvent, node ->
                     if (node == null) {
-                        val hitResults = frame?.hitTest(motionEvent.x, motionEvent.y)
-                        hitResults?.firstByTypeOrNull(Plane.Type.entries.toSet())?.createAnchorOrNull()
-                            ?.let { anchor ->
+                        if(arViewer.mode == Mode.ADD){
+                            val hitResults = frame?.hitTest(motionEvent.x, motionEvent.y)
+                            hitResults?.firstByTypeOrNull(Plane.Type.entries.toSet())?.createAnchorOrNull()
+                                ?.let { anchor ->
+                                    val anchorNode = AnchorNode(engine, anchor).apply {
+                                        addChildNode(
+                                            ModelNode(modelLoader.createInstance(
+                                                modelLoader.createModel("models/nexus.glb")
+                                            )!!)
+                                        )
+                                    }
 
-                            }
+                                }
+                        }
+
+                    }else{
+
                     }
                 }),
         )
@@ -125,13 +148,13 @@ fun ARNav(
                 .padding(16.dp),
             textAlign = TextAlign.Center,
             fontSize = 16.sp,
-            color = Color.White,
-//            text = "Halo! Halo semuanya! Apakah suara saya terdengar? Saya ingin bertanya"
-            text = trackingFailureReason?.getDescription(LocalContext.current) ?: if (childNodes.isEmpty()) {
-                stringResource(R.string.ar_scan_direction)
-            } else {
-                stringResource(R.string.ar_place_direction)
-            }
+            color = Color.Gray,
+            text = arViewer.mode.toString()
+//            text = trackingFailureReason?.getDescription(LocalContext.current) ?: if (childNodes.isEmpty()) {
+//                stringResource(R.string.ar_scan_direction)
+//            } else {
+//                stringResource(R.string.ar_place_direction)
+//            }
         )
 
             FloatingActionButton(

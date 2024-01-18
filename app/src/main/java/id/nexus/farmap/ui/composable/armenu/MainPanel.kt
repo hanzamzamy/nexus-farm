@@ -12,7 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.ar.core.Pose
+import id.nexus.farmap.helper.ar.ARContent
+import id.nexus.farmap.helper.ar.ViewerData
 import id.nexus.farmap.helper.ui.ARMenuNavigator
+import id.nexus.farmap.ui.MainUI
+import io.github.sceneview.math.Rotation
+import io.github.sceneview.math.toQuaternion
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -60,7 +66,7 @@ fun MainPanel(
 
             Button(
                 onClick = {
-                    //menuNavController.navigate(ARMenuNavigator.MapUpload.route)
+
                 }
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

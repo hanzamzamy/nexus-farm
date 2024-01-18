@@ -3,8 +3,6 @@ package id.nexus.farmap.helper.ar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
-
 class ViewerData {
     var showBottomSheet by mutableStateOf(false)
     var tempNodeID by mutableStateOf("")

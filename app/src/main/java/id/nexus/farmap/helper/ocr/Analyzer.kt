@@ -69,6 +69,7 @@ class Analyzer(
                         if (bBox != null){
                             val cPoint = Pair(bBox.exactCenterX(), bBox.exactCenterY())
                             result = block.text
+                            onSuccess("Found $result at $cPoint.")
                         }else{
                             onFail("No bounding box found.")
                         }
